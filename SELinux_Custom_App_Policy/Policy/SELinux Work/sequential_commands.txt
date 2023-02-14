@@ -1,0 +1,24 @@
+#PLEASE NOTE: There are likely some packages you will need to install to perform all the steps below.
+#I normally would have listed them, however most work was done in a not-so-well-slept state. So you know how it goes.
+
+#setting labels for associate files:
+chcon -t CORWY_exec_t proj
+chcon -t CORWY_config_file_t settings.conf
+chcon -t CORWY_log_file_t settings.log
+
+#module checking, making, and permission pushing:
+checkmodule -M -m CORWY.te -o CORWY.mod
+semodule package -m CORWY.mod -o CORWY.pp
+semodule -i CORWY.pp 
+setenforce 0
+./CORWY
+sudo grep CORWY /var/log/audit/audit.log | audit2allow -m CORWY > CORWY.te 
+
+#After making the required .te policy modifications:
+checkmodule -M -m CORWY.te -o CORWY.mod 
+semodule_package -m CORWY.mod -o CORWY.pp 
+semodule -i CORWY.pp 
+setenforce 1
+./CORWY
+
+#It should now work.

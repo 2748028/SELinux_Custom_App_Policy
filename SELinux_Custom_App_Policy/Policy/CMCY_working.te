@@ -1,0 +1,16 @@
+module CMCY 1.0;
+
+require {
+	type unconfined_t;
+        class file { execute execute_no_trans getattr map open read write };
+}
+type CMCY_t;
+type CMCY_exec_t;
+type CORWY_config_file_t;
+type CORWY_log_file_t;
+
+#============= unconfined_t ==============
+
+allow unconfined_t CMCY_exec_t:file { execute execute_no_trans getattr map open read };
+
+allow unconfined_t CMCY_t:file { getattr open read write };

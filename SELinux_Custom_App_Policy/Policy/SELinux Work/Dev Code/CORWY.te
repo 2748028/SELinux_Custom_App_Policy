@@ -1,0 +1,57 @@
+
+module CORWY 1.0;
+
+require {
+	type CORWY_t;
+	type CORWY_exec_t;
+	type CORWY_config_file_t;
+	type CORWY_log_file_t;
+	role unconfined_r types CORWY_t;
+	type_transition unconfined_t CORWY_exec_t : process CORWY_t;
+
+	type user_devpts_t;
+	type unconfined_t;
+	type ld_so_t;
+	type ld_so_cache_t;
+	type lib_t;
+	type etc_t;
+	type fs_t;
+	type user_home_t;
+	class file { create entrypoint execute getattr map open read relabelto write };
+	class process { noatsecure rlimitinh siginh transition };
+	class filesystem associate;
+	class chr_file { append getattr read write };
+	class fd use;
+	class dir { add_name search write };
+	class lnk_file read;
+}
+
+#============= CORWY_config_file_t ==============
+allow CORWY_config_file_t fs_t:filesystem associate;
+
+#============= CORWY_exec_t ==============
+allow CORWY_exec_t fs_t:filesystem associate;
+
+#============= CORWY_log_file_t ==============
+allow CORWY_log_file_t fs_t:filesystem associate;
+
+#============= CORWY_t ==============
+allow CORWY_t CORWY_config_file_t:file { getattr open read };
+allow CORWY_t CORWY_exec_t:file { entrypoint execute map read };
+allow CORWY_t CORWY_log_file_t:file { getattr open write };
+allow CORWY_t etc_t:dir search;
+allow CORWY_t ld_so_cache_t:file { getattr map open read };
+allow CORWY_t ld_so_t:file { execute map read };
+allow CORWY_t lib_t:dir search;
+allow CORWY_t lib_t:file { execute getattr map open read };
+allow CORWY_t lib_t:lnk_file read;
+allow CORWY_t unconfined_t:fd use;
+allow CORWY_t user_devpts_t:chr_file { append getattr read write };
+allow CORWY_t user_home_t:dir { add_name write };
+allow CORWY_t user_home_t:file create;
+
+#============= unconfined_t ==============
+allow unconfined_t CORWY_config_file_t:file { getattr open read relabelto write };
+allow unconfined_t CORWY_exec_t:file { execute getattr open read relabelto write };
+allow unconfined_t CORWY_log_file_t:file { getattr open read relabelto write };
+allow unconfined_t CORWY_t:process { noatsecure rlimitinh siginh transition };
